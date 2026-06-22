@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="container py-5">
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="glass-card p-3 reveal-card">
+        {% if lesson.has_video %}
+        <div class="ratio ratio-16x9 social-video mb-3">
+          <iframe src="{{ lesson.video_embed_url }}" title="{{ lesson.title }}" allowfullscreen loading="lazy"></iframe>
+        </div>
+        {% endif %}
+        {% if lesson.cover_image %}
+        <img src="{{ url_for('static', filename='uploads/lessons/' ~ lesson.cover_image) }}" class="detail-image" alt="{{ lesson.title }}">
+        {% else %}
+        <div class="detail-image d-flex align-items-center justify-content-center bg-body-tertiary">
+          <div class="text-center p-5">
+            <i class="bi bi-book-half display-1 text-success"></i>
+            <div class="fw-semibold mt-3">Civic learning module</div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="glass-card p-4 reveal-card sticky-side">
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <span class="badge text-bg-primary-subtle text-primary-emphasis">Module {{ lesson.order }}</span>
+          <span class="badge text-bg-warning-subtle text-warning-emphasis">{{ lesson.estimated_minutes }} min</span>
+          {% if progress and progress.completed %}
+          <span class="badge text-bg-success-subtle text-success-emphasis">Completed</span>
+          {% endif %}
+        </div>
+        <h1 class="section-title mb-2">{{ lesson.title }}</h1>
+        <p class="text-muted mb-3">{{ lesson.summary }}</p>
+        <div class="d-flex align-items-center gap-2 mb-4">
+          <div class="avatar avatar--sm">{% if lesson.author %}{{ lesson.author.username[:1]|upper }}{% else %}K{% endif %}</div>
+          <div>
+            <div class="fw-semibold">{{ lesson.author.username if lesson.author else "Admin team" }}</div>
+            <div class="small text-muted">Published {{ lesson.created_at.strftime("%d %b %Y") }}</div>
+          </div>
+        </div>
+        <div class="p-3 rounded-4 bg-body-tertiary mb-4">
+          <div class="small text-muted text-uppercase mb-2">Course progress</div>
+          <div class="progress" style="height: 12px;">
+            <div class="progress-bar" style="width: {{ course_progress }}%"></div>
+          </div>
+          <div class="small text-muted mt-2">{{ completed_lessons }} of {{ total_lessons }} modules completed</div>
+        </div>
+        <div class="d-flex flex-wrap gap-2 mb-4">
+          {% if current_user.is_authenticated %}
+          <form method="post" action="{{ url_for('learning.progress', slug=lesson.slug) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="completed" value="{{ 0 if progress and progress.completed else 1 }}">
+            <input type="hidden" name="reached_end" value="{{ 1 if progress and progress.completed else 0 }}" id="lessonReachedEnd">
+            <button class="btn btn-primary" type="submit" id="lessonCompleteButton" {% if not progress or not progress.completed %}disabled{% endif %}>
+              {{ "Mark incomplete" if progress and progress.completed else "Mark complete" }}
+            </button>
+          </form>
+          {% endif %}
+          {% if lesson.attachment_filename %}
+          <a class="btn btn-outline-primary" href="{{ url_for('learning.file', filename=lesson.attachment_filename) }}">Download resource</a>
+          {% endif %}
+          {% if current_user.is_authenticated and (lesson.user_id == current_user.id or current_user.is_admin) %}
+          <a class="btn btn-outline-secondary" href="{{ url_for('learning.edit', slug=lesson.slug) }}">Edit lesson</a>
+          {% endif %}
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          {% if previous_lesson %}
+          <a class="btn btn-outline-secondary" href="{{ url_for('learning.detail', slug=previous_lesson.slug) }}">Previous</a>
+          {% endif %}
+          {% if next_lesson %}
+          <a class="btn btn-outline-secondary" href="{{ url_for('learning.detail', slug=next_lesson.slug) }}">Next</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-5 g-4">
+    <div class="col-lg-8">
+      <div class="glass-card p-4 reveal-card">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+          <span class="badge text-bg-primary-subtle text-primary-emphasis">Lesson reader</span>
+          <div class="small text-muted"><span id="lessonPageCurrent">1</span> / <span id="lessonPageTotal">1</span> pages</div>
+        </div>
+        <div class="lesson-reader" id="lessonReader">
+          {% for paragraph in lesson.content.split('\n') %}
+          {% if paragraph.strip() %}
+          <article class="lesson-page{% if not loop.first %} d-none{% endif %}" data-lesson-page>
+            <div class="small text-muted text-uppercase mb-2">Page {{ loop.index }}</div>
+            <p>{{ paragraph }}</p>
+          </article>
+          {% endif %}
+          {% endfor %}
+        </div>
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3">
+          <button class="btn btn-outline-secondary" type="button" id="lessonPrevPage"><i class="bi bi-arrow-left"></i> Previous</button>
+          <button class="btn btn-primary" type="button" id="lessonNextPage">Next <i class="bi bi-arrow-right"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="glass-card p-4 reveal-card mb-4">
+        <span class="badge text-bg-primary-subtle text-primary-emphasis mb-3">Practical takeaways</span>
+        <ul class="list-unstyled small text-muted upload-tips mb-0">
+          <li>Connect the lesson to one real issue in your county or ward.</li>
+          <li>Discuss the topic with another voter using verified information.</li>
+          <li>Create or upload a civic artwork that explains the lesson simply.</li>
+        </ul>
+      </div>
+      <div class="glass-card p-4 reveal-card mb-4">
+        <span class="badge text-bg-warning-subtle text-warning-emphasis mb-3">Learning actions</span>
+        <div class="submission-steps">
+          <div class="step-item">
+            <span class="step-dot"></span>
+            <div>
+              <div class="fw-semibold">Review the civic principle</div>
+              <div class="small text-muted">Focus on how the lesson applies to daily participation and voting behavior.</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <span class="step-dot"></span>
+            <div>
+              <div class="fw-semibold">Complete the module</div>
+              <div class="small text-muted">Mark completion when you finish the lesson so progress stays accurate.</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <span class="step-dot"></span>
+            <div>
+              <div class="fw-semibold">Add your own lesson</div>
+              <div class="small text-muted">Users and admins can publish additional civic content to extend the course.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% if current_user.is_authenticated and (lesson.user_id == current_user.id or current_user.is_admin) %}
+      <div class="glass-card p-4 reveal-card">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div>
+            <h2 class="h5 mb-1">Lesson management</h2>
+            <p class="small text-muted mb-0">Maintain the course from here.</p>
+          </div>
+          <span class="dashboard-chip">Owner</span>
+        </div>
+        <form method="post" action="{{ url_for('learning.delete', slug=lesson.slug) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-outline-danger w-100" type="submit">Delete lesson</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

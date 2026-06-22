@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="container py-5">
+  <div class="row justify-content-between align-items-end mb-4 g-4">
+    <div class="col-lg-6">
+      <span class="badge text-bg-primary-subtle text-primary-emphasis mb-2">Civic feed</span>
+      <h1 class="section-title">Public feed</h1>
+      <p class="text-muted">Search, filter, and explore civic posts created to educate and engage Kenyan citizens.</p>
+      <div class="story-rail mt-3">
+        {% for category in categories[:8] %}
+        <div class="story-chip">
+          <div class="story-dot"></div>
+          <span>{{ category.name }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="glass-card p-3 feed-toolbar">
+        <form class="row g-2" method="get">
+          <div class="col-md-5">
+            <input class="form-control" type="search" name="q" value="{{ query }}" placeholder="Search artwork">
+          </div>
+          <div class="col-md-4">
+            <select class="form-select" name="category">
+              <option value="">All categories</option>
+              {% for category in categories %}
+              <option value="{{ category.id }}" {% if selected_category == category.id %}selected{% endif %}>{{ category.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select" name="sort">
+              <option value="newest" {% if selected_sort == "newest" %}selected{% endif %}>Newest</option>
+              <option value="popular" {% if selected_sort == "popular" %}selected{% endif %}>Popular</option>
+            </select>
+          </div>
+          <div class="col-12 d-grid">
+            <button class="btn btn-primary" type="submit">Apply Filters</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 align-items-start">
+    <div class="col-lg-8">
+      <div class="masonry-grid">
+        {% for artwork in artworks %}
+        <article class="glass-card masonry-card reveal-card">
+          <div class="social-post__head">
+            {% if artwork.author.profile_image %}
+            <img class="avatar avatar--sm avatar-img" src="{{ url_for('static', filename='uploads/profiles/' ~ artwork.author.profile_image) }}" alt="{{ artwork.author.username }}">
+            {% else %}
+            <div class="avatar avatar--sm">{{ artwork.author.username[:1]|upper }}</div>
+            {% endif %}
+            <div class="flex-grow-1">
+              <div class="fw-semibold">{{ artwork.author.username }}</div>
+              <div class="small text-muted">{{ artwork.created_at.strftime("%d %b %Y") }} | {{ artwork.category.name }}</div>
+            </div>
+            {% if artwork.has_video %}
+            <span class="badge text-bg-danger-subtle"><i class="bi bi-play-circle"></i> Video</span>
+            {% else %}
+            <span class="badge text-bg-primary-subtle text-primary-emphasis"><i class="bi bi-image"></i> Artwork</span>
+            {% endif %}
+          </div>
+          <div class="masonry-media">
+            {% if artwork.has_video %}
+            <div class="ratio ratio-16x9 social-video">
+              <iframe src="{{ artwork.video_embed_url }}" title="{{ artwork.title }}" allowfullscreen loading="lazy"></iframe>
+            </div>
+            {% endif %}
+            {% if artwork.filename %}
+            <img src="{{ url_for('static', filename='uploads/artworks/' ~ artwork.filename) }}" class="art-image" alt="{{ artwork.title }}">
+            {% endif %}
+          </div>
+          <div class="social-post__body">
+            <div class="d-flex justify-content-between align-items-center small text-muted mb-2">
+              <span class="badge text-bg-warning-subtle text-warning-emphasis">{{ artwork.category.name }}</span>
+              <span><i class="bi bi-heart-fill text-danger"></i> {{ artwork.like_count }} likes</span>
+            </div>
+            <h3 class="h5 mb-2">{{ artwork.title }}</h3>
+            <p class="mb-3">{{ artwork.description[:180] }}{% if artwork.description|length > 180 %}...{% endif %}</p>
+            <div class="post-actions">
+              <a class="btn btn-primary" href="{{ url_for('artwork.detail', slug=artwork.slug) }}">Open post</a>
+              <div class="d-flex gap-2 flex-wrap justify-content-end">
+                <span class="action-pill"><i class="bi bi-chat-dots"></i> {{ artwork.comments|length }}</span>
+                <span class="action-pill"><i class="bi bi-bookmark"></i> {{ artwork.favourite_count }}</span>
+                <span class="action-pill"><i class="bi bi-share"></i> {{ artwork.share_count }}</span>
+                {% if artwork.filename %}
+                <span class="action-pill"><i class="bi bi-download"></i> {{ artwork.download_count }}</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </article>
+        {% else %}
+        <div class="glass-card p-4">
+          <div class="alert alert-warning mb-0">No artwork found for the selected filters.</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="glass-card p-4 sticky-side reveal-card mb-4">
+        <span class="badge text-bg-primary-subtle text-primary-emphasis mb-3">Trending themes</span>
+        <div class="stack-list compact">
+          {% for category in categories[:6] %}
+          <div class="mini-activity d-flex justify-content-between align-items-center">
+            <span>{{ category.name }}</span>
+            <i class="bi bi-arrow-up-right-circle text-primary"></i>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="glass-card p-4 reveal-card">
+        <span class="badge text-bg-warning-subtle text-warning-emphasis mb-3">Voting tips</span>
+        <div class="flag-bar mb-3"></div>
+        <p class="small text-muted mb-3">A thoughtful vote strengthens democracy. Keep these reminders close when exploring civic artwork.</p>
+        <ul class="list-unstyled small text-muted upload-tips mb-3">
+          <li>Check the candidate's record before trusting campaign designs.</li>
+          <li>Focus on issues like education, health, and citizen rights.</li>
+          <li>Encourage friends and family to vote safely and fairly.</li>
+        </ul>
+        <a class="btn btn-outline-primary w-100 mb-2" href="{{ url_for('artwork.create') }}">Upload your civic post</a>
+        <a class="btn btn-primary w-100" href="{{ url_for('learning.index') }}">Study the course</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

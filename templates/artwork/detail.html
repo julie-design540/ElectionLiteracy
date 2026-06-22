@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="container py-5">
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="glass-card p-3 reveal-card">
+        {% if artwork.has_video %}
+        <div class="ratio ratio-16x9 social-video mb-3">
+          <iframe src="{{ artwork.video_embed_url }}" title="{{ artwork.title }}" allowfullscreen loading="lazy"></iframe>
+        </div>
+        {% endif %}
+        {% if artwork.filename %}
+        <img src="{{ url_for('static', filename='uploads/artworks/' ~ artwork.filename) }}" class="detail-image" alt="{{ artwork.title }}">
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="glass-card p-4 reveal-card sticky-side">
+        <div class="d-flex flex-wrap gap-2 mb-2">
+          <span class="badge text-bg-primary-subtle text-primary-emphasis">{{ artwork.category.name }}</span>
+          <span class="badge text-bg-warning-subtle text-warning-emphasis">{{ artwork.status|capitalize }}</span>
+        </div>
+        <h1 class="section-title">{{ artwork.title }}</h1>
+        <div class="author-line mb-3">
+          <div class="avatar avatar--sm">{{ artwork.author.username[:1]|upper }}</div>
+          <div>
+            <div class="fw-semibold">{{ artwork.author.username }}</div>
+            <div class="small text-muted">Posted {{ artwork.created_at.strftime("%d %b %Y") }}</div>
+          </div>
+        </div>
+        <p class="text-body">{{ artwork.description }}</p>
+        <div class="detail-stats mb-4">
+          <div><span class="fw-semibold">{{ artwork.like_count }}</span><span class="small text-muted d-block">Likes</span></div>
+          <div><span class="fw-semibold">{{ artwork.share_count }}</span><span class="small text-muted d-block">Shares</span></div>
+          <div><span class="fw-semibold">{{ artwork.favourite_count }}</span><span class="small text-muted d-block">Favourites</span></div>
+          <div><span class="fw-semibold">{{ artwork.download_count }}</span><span class="small text-muted d-block">Downloads</span></div>
+        </div>
+        <div class="d-flex flex-wrap gap-2 mb-4">
+          {% if current_user.is_authenticated %}
+          <form method="post" action="{{ url_for('artwork.toggle_like', slug=artwork.slug) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-outline-primary" type="submit"><i class="bi bi-heart"></i> Like</button>
+          </form>
+          <form method="post" action="{{ url_for('artwork.toggle_favourite', slug=artwork.slug) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-outline-warning" type="submit"><i class="bi bi-bookmark"></i> Save</button>
+          </form>
+          <form method="post" action="{{ url_for('artwork.share', slug=artwork.slug) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-share"></i> Share</button>
+          </form>
+          {% endif %}
+          {% if artwork.filename %}
+          <a class="btn btn-primary" href="{{ url_for('artwork.download', slug=artwork.slug) }}"><i class="bi bi-download"></i> Download</a>
+          {% endif %}
+        </div>
+        <div class="small text-muted">Uploaded by {{ artwork.author.username }} on {{ artwork.created_at.strftime("%d %b %Y") }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-5 g-4">
+    <div class="col-lg-7">
+      <div class="glass-card p-4 reveal-card">
+        <h2 class="h4 mb-4">Comments</h2>
+        {% for comment in artwork.comments %}
+        <div class="comment-item mb-3">
+          <div class="comment-row">
+            <div class="avatar avatar--xs">{{ comment.author.username[:1]|upper }}</div>
+            <div class="flex-grow-1">
+              <div class="fw-semibold">{{ comment.author.username }}</div>
+              <div class="small text-muted">{{ comment.created_at.strftime("%d %b %Y, %H:%M") }}</div>
+              <p class="mb-0">{{ comment.content }}</p>
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <p class="text-muted">No comments yet.</p>
+        {% endfor %}
+        {% if current_user.is_authenticated %}
+        <form method="post" action="{{ url_for('artwork.detail', slug=artwork.slug) }}">
+          {{ comment_form.hidden_tag() }}
+          <input type="hidden" name="form_name" value="comment">
+          <div class="mb-3">{{ comment_form.content.label(class="form-label") }}{{ comment_form.content(class="form-control", rows="4") }}</div>
+          <button class="btn btn-primary" type="submit">{{ comment_form.submit.label.text }}</button>
+        </form>
+        {% else %}
+        <div class="alert alert-info mb-0">Log in to leave a comment, like, or save this artwork.</div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="glass-card p-4 reveal-card">
+        <h2 class="h4 mb-3">Community activity</h2>
+        <div class="mb-4">
+          <div class="small text-muted mb-2">Liked by</div>
+          <div class="engagement-avatars">
+            {% for like in recent_likers %}
+            <div class="action-pill">
+              <div class="avatar avatar--xs">{{ like.user.username[:1]|upper }}</div>
+              <span>{{ like.user.username }}</span>
+            </div>
+            {% else %}
+            <div class="small text-muted">No likes yet.</div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="mb-4">
+          <div class="small text-muted mb-2">Shared by</div>
+          <div class="engagement-avatars">
+            {% for share in recent_sharers %}
+            <div class="action-pill">
+              <div class="avatar avatar--xs">{{ share.user.username[:1]|upper }}</div>
+              <span>{{ share.user.username }}</span>
+            </div>
+            {% else %}
+            <div class="small text-muted">No shares yet.</div>
+            {% endfor %}
+          </div>
+        </div>
+        <h2 class="h5 mb-3">Voting guide</h2>
+        <div class="small text-muted mb-3">A quick civic checklist to help you stay informed throughout election season.</div>
+        <ul class="list-unstyled small text-muted mb-4 upload-tips">
+          <li>Review manifestos for candidates and parties before you vote.</li>
+          <li>Use your national ID and confirm your polling station.</li>
+          <li>Be respectful in comments and votes; civic duty is community care.</li>
+        </ul>
+        <hr class="mb-4">
+        <h2 class="h5 mb-3">Report artwork</h2>
+        {% if current_user.is_authenticated %}
+        <form method="post" action="{{ url_for('artwork.report', slug=artwork.slug) }}">
+          {{ report_form.hidden_tag() }}
+          <div class="mb-3">{{ report_form.reason.label(class="form-label") }}{{ report_form.reason(class="form-select") }}</div>
+          <div class="mb-3">{{ report_form.details.label(class="form-label") }}{{ report_form.details(class="form-control", rows="4") }}</div>
+          <button class="btn btn-danger" type="submit">{{ report_form.submit.label.text }}</button>
+        </form>
+        {% else %}
+        <div class="alert alert-info mb-0">Log in to report civic artwork.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

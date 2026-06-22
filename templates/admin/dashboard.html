@@ -1,0 +1,379 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="admin-hero">
+  <div class="container py-5">
+    <div class="row align-items-end g-4">
+      <div class="col-lg-8">
+        <span class="badge text-bg-warning-subtle text-warning-emphasis mb-3">Admin command center</span>
+        <h1 class="display-5 fw-bold hero-title">Run moderation, lessons, and community operations from one place.</h1>
+        <p class="lead text-white-75 mb-0">Track civic content health, learning progress, and new uploads without losing focus on the public experience.</p>
+      </div>
+      <div class="col-lg-4 text-lg-end">
+        <div class="d-flex flex-wrap gap-2 justify-content-lg-end">
+          <a class="btn btn-warning btn-lg fw-semibold" href="{{ url_for('admin.manage_artworks') }}">Review Artwork</a>
+          <a class="btn btn-outline-light btn-lg" href="{{ url_for('admin.manage_lessons') }}">Manage Lessons</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container py-4">
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+      <a href="{{ url_for('admin.manage_artworks') }}" class="admin-menu-card glass-card p-4 text-decoration-none">
+        <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+          <div>
+            <h3 class="h6 mb-1">Artwork queue</h3>
+            <p class="small text-muted mb-0">Pending civic uploads</p>
+          </div>
+          <i class="bi bi-folder-check fs-2 text-success"></i>
+        </div>
+        <div class="display-6 fw-bold">{{ stats.pending }}</div>
+      </a>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+      <a href="{{ url_for('admin.manage_lessons') }}" class="admin-menu-card glass-card p-4 text-decoration-none">
+        <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+          <div>
+            <h3 class="h6 mb-1">Lessons</h3>
+            <p class="small text-muted mb-0">Course modules</p>
+          </div>
+          <i class="bi bi-journal-text fs-2 text-warning"></i>
+        </div>
+        <div class="display-6 fw-bold">{{ stats.lessons }}</div>
+      </a>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+      <a href="{{ url_for('admin.view_reports') }}" class="admin-menu-card glass-card p-4 text-decoration-none">
+        <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+          <div>
+            <h3 class="h6 mb-1">Reports</h3>
+            <p class="small text-muted mb-0">Community flags</p>
+          </div>
+          <i class="bi bi-flag-fill fs-2 text-danger"></i>
+        </div>
+        <div class="display-6 fw-bold">{{ stats.reports }}</div>
+      </a>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+      <a href="{{ url_for('admin.manage_users') }}" class="admin-menu-card glass-card p-4 text-decoration-none">
+        <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+          <div>
+            <h3 class="h6 mb-1">Users</h3>
+            <p class="small text-muted mb-0">Active members</p>
+          </div>
+          <i class="bi bi-people-fill fs-2 text-primary"></i>
+        </div>
+        <div class="display-6 fw-bold">{{ stats.users }}</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="container py-4">
+  <div class="glass-card p-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-4">
+      <div>
+        <span class="badge text-bg-primary-subtle text-primary-emphasis mb-2">Operational summary</span>
+        <h2 class="h4 mb-2">Platform health at a glance</h2>
+        <p class="small text-muted mb-0">Moderation and learning metrics help the team focus on what is actually moving the platform forward.</p>
+      </div>
+      <span class="dashboard-chip">Kenyan civic learning</span>
+    </div>
+    <div class="row g-3">
+      <div class="col-md-3 col-6">
+        <div class="metric-card glass-card p-4 reveal-card">
+          <div class="small text-muted text-uppercase">Users</div>
+          <div class="display-6 fw-bold counter" data-count="{{ stats.users }}">0</div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="metric-card glass-card p-4 reveal-card">
+          <div class="small text-muted text-uppercase">Artworks</div>
+          <div class="display-6 fw-bold counter" data-count="{{ stats.artworks }}">0</div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="metric-card glass-card p-4 reveal-card accent">
+          <div class="small text-muted text-uppercase">Lessons completed</div>
+          <div class="display-6 fw-bold counter" data-count="{{ stats.lesson_completed }}">0</div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="metric-card glass-card p-4 reveal-card">
+          <div class="small text-muted text-uppercase">Open reports</div>
+          <div class="display-6 fw-bold counter" data-count="{{ stats.reports }}">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container py-4">
+  <div class="glass-card p-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+      <div>
+        <span class="badge text-bg-danger mb-2">Post control</span>
+        <h2 class="h5 mb-1">Delete posts and artwork</h2>
+        <p class="small text-muted mb-0">Remove civic posts, artwork uploads, videos, and their related activity from the platform.</p>
+      </div>
+      <a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin.manage_artworks') }}">Open full artwork manager</a>
+    </div>
+    <div class="stack-list">
+      {% for artwork in recent_artworks %}
+      <div class="queue-card">
+        <div class="queue-art">
+          {% if artwork.filename %}
+          <img src="{{ url_for('static', filename='uploads/artworks/' ~ artwork.filename) }}" alt="{{ artwork.title }}">
+          {% elif artwork.has_video %}
+          <div class="queue-art-placeholder"><i class="bi bi-play-circle"></i></div>
+          {% else %}
+          <div class="queue-art-placeholder"><i class="bi bi-image"></i></div>
+          {% endif %}
+        </div>
+        <div class="flex-grow-1">
+          <div class="fw-semibold">{{ artwork.title }}</div>
+          <div class="small text-muted">{{ artwork.author.username }} | {{ artwork.category.name }} | {{ artwork.status|capitalize }}</div>
+        </div>
+        <div class="d-flex gap-2 flex-wrap justify-content-end">
+          <a class="btn btn-sm btn-outline-primary" href="{{ url_for('artwork.detail', slug=artwork.slug) }}">View</a>
+          <form method="post" action="{{ url_for('admin.delete_artwork', artwork_id=artwork.id) }}" onsubmit="return confirm('Delete this post permanently? This cannot be undone.');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-sm btn-danger" type="submit">Delete post</button>
+          </form>
+        </div>
+      </div>
+      {% else %}
+      <div class="empty-spot">
+        <div class="fw-semibold">No posts available.</div>
+        <div class="small text-muted">Uploaded artwork and civic posts will appear here.</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="container py-4">
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="glass-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h2 class="h5 mb-1">Artwork review queue</h2>
+            <p class="small text-muted mb-0">Approve or reject uploads quickly.</p>
+          </div>
+          <a class="small text-decoration-none" href="{{ url_for('admin.manage_artworks') }}">See all</a>
+        </div>
+        <div class="stack-list">
+          {% for artwork in pending_artworks %}
+          <div class="queue-card">
+            <div class="queue-art">
+              {% if artwork.filename %}
+              <img src="{{ url_for('static', filename='uploads/artworks/' ~ artwork.filename) }}" alt="{{ artwork.title }}">
+              {% else %}
+              <div class="queue-art-placeholder"><i class="bi bi-play-circle"></i></div>
+              {% endif %}
+            </div>
+            <div class="flex-grow-1">
+              <div class="fw-semibold">{{ artwork.title }}</div>
+              <div class="small text-muted">{{ artwork.author.username }} | {{ artwork.category.name }}</div>
+            </div>
+            <div class="d-flex gap-2">
+              <form method="post" action="{{ url_for('admin.moderate_artwork', artwork_id=artwork.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="status" value="approved">
+                <button class="btn btn-sm btn-success" type="submit">Approve</button>
+              </form>
+              <form method="post" action="{{ url_for('admin.moderate_artwork', artwork_id=artwork.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="status" value="rejected">
+                <button class="btn btn-sm btn-outline-danger" type="submit">Reject</button>
+              </form>
+              <form method="post" action="{{ url_for('admin.delete_artwork', artwork_id=artwork.id) }}" onsubmit="return confirm('Delete this post permanently? This cannot be undone.');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+              </form>
+            </div>
+          </div>
+          {% else %}
+          <div class="empty-spot">
+            <div class="fw-semibold">No pending uploads.</div>
+            <div class="small text-muted">New submissions will appear here automatically.</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="glass-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h2 class="h5 mb-1">Learning modules</h2>
+            <p class="small text-muted mb-0">Recent course content uploaded to the platform.</p>
+          </div>
+          <a class="small text-decoration-none" href="{{ url_for('admin.manage_lessons') }}">Manage</a>
+        </div>
+        <div class="stack-list compact mb-4">
+          {% for lesson in recent_lessons %}
+          <div class="mini-activity">
+            <div class="fw-semibold">{{ lesson.title }}</div>
+            <div class="small text-muted">{{ lesson.order }} | {{ lesson.summary[:90] }}{% if lesson.summary|length > 90 %}...{% endif %}</div>
+          </div>
+          {% else %}
+          <div class="empty-spot">
+            <div class="fw-semibold">No lessons yet.</div>
+            <div class="small text-muted">Publish the first civic course module from the learning area.</div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h2 class="h5 mb-1">Recent reports</h2>
+            <p class="small text-muted mb-0">Community moderation requests.</p>
+          </div>
+          <a class="small text-decoration-none" href="{{ url_for('admin.view_reports') }}">Open</a>
+        </div>
+        <div class="stack-list compact">
+          {% for report in recent_reports %}
+          <div class="mini-activity">
+            <div class="fw-semibold">{{ report.artwork.title }}</div>
+            <div class="small text-muted">{{ report.reason }} | {{ report.status }}</div>
+          </div>
+          {% else %}
+          <div class="empty-spot">
+            <div class="fw-semibold">No open reports.</div>
+            <div class="small text-muted">Reports that arrive later will show here.</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container py-4">
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="glass-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h2 class="h5 mb-1">Status distribution</h2>
+            <p class="small text-muted mb-0">Review pipeline overview for artwork moderation.</p>
+          </div>
+        </div>
+        <div class="chart-shell">
+          <canvas id="statusChart" data-labels='{{ status_labels|tojson }}' data-values='{{ status_counts|tojson }}'></canvas>
+        </div>
+        <div class="chart-summary-grid">
+          {% for label in status_labels %}
+          <div class="chart-summary-item">
+            <span>{{ label }}</span>
+            <strong>{{ status_counts[loop.index0] }}</strong>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="glass-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h2 class="h5 mb-1">Category spread</h2>
+            <p class="small text-muted mb-0">Most active civic themes.</p>
+          </div>
+          <a class="small text-decoration-none" href="{{ url_for('admin.manage_categories') }}">Manage</a>
+        </div>
+        {% if category_labels %}
+        <div class="chart-shell chart-shell-sm mb-3">
+          <canvas id="categoryChart" data-labels='{{ category_labels|tojson }}' data-values='{{ category_counts|tojson }}'></canvas>
+        </div>
+        {% else %}
+        <div class="empty-spot mb-3">
+          <div class="fw-semibold">No category chart yet.</div>
+          <div class="small text-muted">Category trends will appear when submissions are added.</div>
+        </div>
+        {% endif %}
+        <div class="category-bars">
+          {% for category_name, total in category_breakdown %}
+          <div class="category-bar">
+            <div class="d-flex justify-content-between small mb-1">
+              <span>{{ category_name }}</span>
+              <span>{{ total }}</span>
+            </div>
+            <div class="progress" role="progressbar" aria-label="{{ category_name }}">
+              <div class="progress-bar" style="width: {{ (total * 100 / (stats.artworks or 1))|round(0, 'floor') }}%"></div>
+            </div>
+          </div>
+          {% else %}
+          <p class="text-muted mb-0">No category data yet.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container py-4 pb-5">
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="glass-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h2 class="h5 mb-1">Newest users</h2>
+            <p class="small text-muted mb-0">Recent registrations.</p>
+          </div>
+          <a class="small text-decoration-none" href="{{ url_for('admin.manage_users') }}">Manage</a>
+        </div>
+        <div class="stack-list compact">
+          {% for user in recent_users %}
+          <div class="mini-activity">
+            <div class="fw-semibold">{{ user.username }}</div>
+            <div class="small text-muted">{{ user.email }}</div>
+          </div>
+          {% else %}
+          <div class="empty-spot">
+            <div class="fw-semibold">No users yet.</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="glass-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h2 class="h5 mb-1">Learning metrics</h2>
+            <p class="small text-muted mb-0">Course activity across the platform.</p>
+          </div>
+          <a class="small text-decoration-none" href="{{ url_for('admin.manage_lessons') }}">Open lessons</a>
+        </div>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="admin-impact-card p-4 h-100">
+              <div class="small text-muted text-uppercase mb-2">Lesson count</div>
+              <div class="display-6 fw-bold mb-1">{{ stats.lessons }}</div>
+              <div class="small text-muted">Published modules</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="admin-impact-card p-4 h-100">
+              <div class="small text-muted text-uppercase mb-2">Progress logs</div>
+              <div class="display-6 fw-bold mb-1">{{ stats.lesson_progress }}</div>
+              <div class="small text-muted">Tracked lesson views</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="admin-impact-card p-4 h-100">
+              <div class="small text-muted text-uppercase mb-2">Completed</div>
+              <div class="display-6 fw-bold mb-1">{{ stats.lesson_completed }}</div>
+              <div class="small text-muted">Marked complete by users</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

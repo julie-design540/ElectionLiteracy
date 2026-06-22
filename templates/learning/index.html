@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero-section">
+  <div class="container py-5">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-7">
+        <span class="badge text-bg-light text-dark mb-3">Civic learning course</span>
+        <h1 class="display-5 fw-bold hero-title">Build civic confidence with a structured learning path.</h1>
+        <p class="lead text-white-75 mb-4">Follow short modules on voting, leadership, accountability, and community participation. Track your progress as you go.</p>
+        <div class="d-flex flex-wrap gap-3">
+          <a class="btn btn-warning btn-lg fw-semibold" href="{{ url_for('learning.detail', slug=continue_lesson.slug) if continue_lesson else url_for('learning.create') }}">
+            {{ "Continue course" if continue_lesson else "Start a lesson" }}
+          </a>
+          {% if current_user.is_authenticated %}
+          <a class="btn btn-outline-light btn-lg" href="{{ url_for('learning.create') }}">Upload lesson content</a>
+          {% else %}
+          <a class="btn btn-outline-light btn-lg" href="{{ url_for('auth.register') }}">Join to track progress</a>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="hero-card glass-card p-4">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+              <div class="small text-muted">Course progress</div>
+              <h2 class="h4 mb-0">Your learning journey</h2>
+            </div>
+            <i class="bi bi-journal-check fs-2 text-warning"></i>
+          </div>
+          <div class="p-3 rounded-4 bg-body-tertiary mb-3">
+            <div class="d-flex justify-content-between small mb-2">
+              <span>Completed modules</span>
+              <span>{{ completed_lessons }} / {{ total_lessons }}</span>
+            </div>
+            <div class="progress" style="height: 12px;">
+              <div class="progress-bar" style="width: {{ progress_percent }}%"></div>
+            </div>
+          </div>
+          <div class="row g-3">
+            <div class="col-6">
+              <div class="mini-tile">
+                <div>
+                  <div class="display-6 fw-bold mb-0">{{ total_lessons }}</div>
+                  <div class="small text-muted">Modules available</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="mini-tile">
+                <div>
+                  <div class="display-6 fw-bold mb-0">{{ progress_percent|int }}%</div>
+                  <div class="small text-muted">Course progress</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% if continue_lesson %}
+          <div class="mt-3 p-3 rounded-4 bg-body-tertiary">
+            <div class="small text-muted text-uppercase mb-1">Continue next</div>
+            <div class="fw-semibold">{{ continue_lesson.title }}</div>
+            <div class="small text-muted">{{ continue_lesson.summary }}</div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container py-5">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4">
+    <div>
+      <span class="badge text-bg-primary-subtle text-primary-emphasis mb-2">Course outline</span>
+      <h2 class="section-title mb-1">All modules</h2>
+      <p class="text-muted mb-0">Structured lessons created by the community and the admin team.</p>
+    </div>
+    <a class="btn btn-outline-primary" href="{{ url_for('learning.create') }}">Add lesson content</a>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="stack-list">
+        {% for lesson in lessons %}
+        {% set progress = progress_map.get(lesson.id) %}
+        <article class="course-card reveal-card">
+          <div class="course-card__head">
+            <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
+              <div class="d-flex gap-3">
+                <div class="submission-badge flex-shrink-0">
+                  <span class="fw-bold">{{ "%02d"|format(lesson.order) }}</span>
+                </div>
+                <div>
+                  <div class="course-meta mb-2">
+                    <span>Module {{ lesson.order }}</span>
+                    <span>{{ lesson.estimated_minutes }} min</span>
+                    <span>{{ lesson.completion_count }} learners</span>
+                    {% if lesson.has_video %}
+                    <span><i class="bi bi-play-circle"></i> Video</span>
+                    {% endif %}
+                    {% if progress and progress.completed %}
+                    <span>Completed</span>
+                    {% endif %}
+                  </div>
+                  <h3 class="h4 mb-2">{{ lesson.title }}</h3>
+                  <p class="text-muted mb-0">{{ lesson.summary }}</p>
+                </div>
+              </div>
+              <div class="text-md-end">
+                <div class="small text-muted mb-1">Created by</div>
+                <div class="fw-semibold">{{ lesson.author.username if lesson.author else "Admin team" }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="course-card__body d-flex flex-wrap gap-2 justify-content-between align-items-center">
+            <div class="small text-muted">
+              {% if lesson.attachment_label %}
+              Resource: {{ lesson.attachment_label }}
+              {% else %}
+              Includes reading content, action prompts, and progress tracking.
+              {% endif %}
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+              <a class="btn btn-primary" href="{{ url_for('learning.detail', slug=lesson.slug) }}">Open lesson</a>
+              {% if current_user.is_authenticated and (lesson.user_id == current_user.id or current_user.is_admin) %}
+              <a class="btn btn-outline-secondary" href="{{ url_for('learning.edit', slug=lesson.slug) }}">Edit</a>
+              {% endif %}
+            </div>
+          </div>
+        </article>
+        {% else %}
+        <div class="glass-card p-4">
+          <div class="alert alert-info mb-0">No lessons have been added yet.</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="glass-card p-4 sticky-side reveal-card">
+        <span class="badge text-bg-warning-subtle text-warning-emphasis mb-3">What to expect</span>
+        <div class="submission-steps">
+          <div class="step-item">
+            <span class="step-dot"></span>
+            <div>
+              <div class="fw-semibold">Study the lesson</div>
+              <div class="small text-muted">Each module is short, practical, and focused on civic participation.</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <span class="step-dot"></span>
+            <div>
+              <div class="fw-semibold">Track your progress</div>
+              <div class="small text-muted">Completion is saved to your profile so you can resume later.</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <span class="step-dot"></span>
+            <div>
+              <div class="fw-semibold">Upload new content</div>
+              <div class="small text-muted">Authenticated users and admins can publish additional lesson material.</div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-4">
+
+        <h3 class="h6 mb-3">Course outcomes</h3>
+        <ul class="list-unstyled small text-muted upload-tips mb-4">
+          <li>Explain key rights and duties under the Kenyan Constitution.</li>
+          <li>Prepare for elections with a practical voting checklist.</li>
+          <li>Identify misinformation and respond through safer civic channels.</li>
+          <li>Use public participation tools to follow leaders after elections.</li>
+        </ul>
+
+        <h3 class="h6 mb-3">Featured modules</h3>
+        <div class="stack-list compact">
+          {% for lesson in featured_lessons %}
+          <a class="mini-activity text-decoration-none" href="{{ url_for('learning.detail', slug=lesson.slug) }}">
+            <div class="fw-semibold">{{ lesson.title }}</div>
+            <div class="small text-muted">{{ lesson.summary[:90] }}{% if lesson.summary|length > 90 %}...{% endif %}</div>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

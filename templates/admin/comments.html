@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="container py-5">
+  <h1 class="section-title mb-4">Moderate Comments</h1>
+  <div class="glass-card p-4">
+    {% for comment in comments %}
+    <div class="border-bottom py-3 d-flex justify-content-between align-items-center gap-3">
+      <div>
+        <div class="fw-semibold">{{ comment.author.username }} on {{ comment.artwork.title }}</div>
+        <div class="text-muted small">{{ comment.content }}</div>
+      </div>
+      <form method="post" action="{{ url_for('admin.toggle_comment', comment_id=comment.id) }}">
+        <button class="btn btn-sm btn-outline-primary" type="submit">{{ 'Unhide' if comment.is_moderated else 'Hide' }}</button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

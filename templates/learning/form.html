@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="container py-5">
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="glass-card p-4 p-md-5">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+          <div>
+            <span class="badge text-bg-primary-subtle text-primary-emphasis mb-2">Learning module</span>
+            <h1 class="section-title mb-0">{{ page_title }}</h1>
+          </div>
+          <div class="small text-muted">Create a polished civic lesson with optional uploaded material.</div>
+        </div>
+        <form method="post" enctype="multipart/form-data">
+          {{ form.hidden_tag() }}
+          <div class="mb-3">{{ form.title.label(class="form-label") }}{{ form.title(class="form-control") }}</div>
+          <div class="mb-3">{{ form.summary.label(class="form-label") }}{{ form.summary(class="form-control") }}</div>
+          <div class="mb-3">{{ form.content.label(class="form-label") }}{{ form.content(class="form-control", rows="10") }}</div>
+          <div class="row g-3">
+            <div class="col-md-4">{{ form.order.label(class="form-label") }}{{ form.order(class="form-control") }}</div>
+            <div class="col-md-4">{{ form.estimated_minutes.label(class="form-label") }}{{ form.estimated_minutes(class="form-control") }}</div>
+            <div class="col-md-4">{{ form.attachment_label.label(class="form-label") }}{{ form.attachment_label(class="form-control") }}</div>
+          </div>
+          <div class="mt-3">{{ form.video_url.label(class="form-label") }}{{ form.video_url(class="form-control", placeholder="YouTube or Vimeo link for this lesson") }}</div>
+          <div class="row g-3 mt-1">
+            <div class="col-md-6">
+              {{ form.cover_image.label(class="form-label") }}
+              {{ form.cover_image(class="form-control") }}
+            </div>
+            <div class="col-md-6">
+              {{ form.attachment.label(class="form-label") }}
+              {{ form.attachment(class="form-control") }}
+            </div>
+          </div>
+          <div class="mt-4 d-flex flex-wrap gap-2">
+            <button class="btn btn-primary" type="submit">{{ form.submit.label.text }}</button>
+            <a class="btn btn-outline-secondary" href="{{ url_for('learning.index') }}">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="glass-card p-4 reveal-card sticky-side">
+        <span class="badge text-bg-warning-subtle text-warning-emphasis mb-3">Course standards</span>
+        <div class="submission-steps">
+          <div class="step-item">
+            <span class="step-dot"></span>
+            <div>
+              <div class="fw-semibold">Keep it concise</div>
+              <div class="small text-muted">Lessons should read like a professional training module, not a long article.</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <span class="step-dot"></span>
+            <div>
+              <div class="fw-semibold">Use a clear sequence</div>
+              <div class="small text-muted">The order field controls where the module sits in the course path.</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <span class="step-dot"></span>
+            <div>
+              <div class="fw-semibold">Upload supporting files</div>
+              <div class="small text-muted">Add a cover image or a PDF, image, or document resource to support the lesson.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

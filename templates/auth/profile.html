@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="container py-5">
+  <div class="profile-hero glass-card p-4 p-md-5 mb-4 reveal-card">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-4">
+      <div class="d-flex align-items-center gap-3">
+        {% if current_user.profile_image %}
+        <img class="profile-avatar profile-avatar--hero" src="{{ url_for('static', filename='uploads/profiles/' ~ current_user.profile_image) }}" alt="Profile image">
+        {% else %}
+        <div class="profile-avatar profile-avatar--hero d-inline-flex align-items-center justify-content-center bg-light text-primary">
+          <i class="bi bi-person-fill fs-1"></i>
+        </div>
+        {% endif %}
+        <div>
+          <span class="badge text-bg-primary-subtle text-primary-emphasis mb-2">Public profile</span>
+          <h1 class="display-6 fw-bold mb-1">{{ current_user.username }}</h1>
+          <div class="text-muted">{{ current_user.email }}</div>
+        </div>
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-primary" href="{{ url_for('artwork.create') }}">Upload artwork</a>
+        <a class="btn btn-outline-primary" href="{{ url_for('learning.create') }}">Upload lesson</a>
+        <a class="btn btn-outline-secondary" href="{{ url_for('auth.edit_profile') }}">Edit profile</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-md-3 col-6">
+      <div class="glass-card p-4 reveal-card">
+        <div class="small text-muted text-uppercase">Artwork</div>
+        <div class="display-6 fw-bold">{{ artworks|length }}</div>
+        <div class="small text-muted">Uploads contributed</div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="glass-card p-4 reveal-card">
+        <div class="small text-muted text-uppercase">Lessons</div>
+        <div class="display-6 fw-bold">{{ lessons_created|length }}</div>
+        <div class="small text-muted">Modules contributed</div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="glass-card p-4 reveal-card">
+        <div class="small text-muted text-uppercase">Learning</div>
+        <div class="display-6 fw-bold">{{ learning_progress|int }}%</div>
+        <div class="small text-muted">Course completion</div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="glass-card p-4 reveal-card">
+        <div class="small text-muted text-uppercase">Favourites</div>
+        <div class="display-6 fw-bold">{{ favourites|length }}</div>
+        <div class="small text-muted">Saved posts</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-lg-3 col-6">
+      <div class="glass-card p-4 reveal-card">
+        <div class="small text-muted text-uppercase">Likes received</div>
+        <div class="display-6 fw-bold">{{ engagement_stats.likes_received }}</div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-6">
+      <div class="glass-card p-4 reveal-card">
+        <div class="small text-muted text-uppercase">Shares received</div>
+        <div class="display-6 fw-bold">{{ engagement_stats.shares_received }}</div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-6">
+      <div class="glass-card p-4 reveal-card">
+        <div class="small text-muted text-uppercase">Downloads</div>
+        <div class="display-6 fw-bold">{{ engagement_stats.downloads_received }}</div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-6">
+      <div class="glass-card p-4 reveal-card">
+        <div class="small text-muted text-uppercase">Comments</div>
+        <div class="display-6 fw-bold">{{ engagement_stats.comments_received }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <div class="glass-card p-4 text-center reveal-card sticky-side">
+        <div class="profile-bio-panel">
+          <h2 class="h5 mb-2">About</h2>
+          <p class="text-muted mb-4">{{ current_user.bio or "No bio added yet. Tell the community why civic education matters to you." }}</p>
+          <div class="mb-4 p-3 rounded-4 bg-body-tertiary">
+            <div class="small text-muted text-uppercase">Average interactions per post</div>
+            <div class="display-6 fw-bold mb-0">{{ engagement_stats.average_interactions_per_post }}</div>
+          </div>
+          {% if continue_lesson %}
+          <div class="p-3 rounded-4 bg-body-tertiary text-start mb-4">
+            <div class="small text-muted text-uppercase mb-1">Resume learning</div>
+            <div class="fw-semibold">{{ continue_lesson.title }}</div>
+            <div class="small text-muted">{{ continue_lesson.summary }}</div>
+            <a class="btn btn-primary btn-sm mt-3" href="{{ url_for('learning.detail', slug=continue_lesson.slug) }}">Open lesson</a>
+          </div>
+          {% endif %}
+          <div class="d-grid gap-2">
+            <a class="btn btn-outline-secondary" href="{{ url_for('auth.change_password') }}">Change password</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-8">
+      <div class="glass-card p-4 mb-4 reveal-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="h5 mb-0">My artwork</h2>
+          <a class="btn btn-primary btn-sm" href="{{ url_for('artwork.create') }}">Upload artwork</a>
+        </div>
+        <div class="row g-3">
+          {% for artwork in artworks %}
+          <div class="col-md-6">
+            <div class="mini-art social-mini">
+              <div class="small text-muted mb-1">{{ artwork.status|capitalize }}</div>
+              <div class="fw-semibold">{{ artwork.title }}</div>
+              <div class="small text-muted">{{ artwork.category.name }}</div>
+              <a href="{{ url_for('artwork.detail', slug=artwork.slug) }}" class="small">Open post</a>
+            </div>
+          </div>
+          {% else %}
+          <div class="col-12"><p class="text-muted">You have not uploaded artwork yet.</p></div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="glass-card p-4 reveal-card mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="h5 mb-0">My lessons</h2>
+          <a class="btn btn-outline-primary btn-sm" href="{{ url_for('learning.create') }}">Create lesson</a>
+        </div>
+        <div class="row g-3">
+          {% for lesson in lessons_created %}
+          <div class="col-md-6">
+            <div class="mini-art social-mini">
+              <div class="small text-muted mb-1">Module {{ lesson.order }}</div>
+              <div class="fw-semibold">{{ lesson.title }}</div>
+              <div class="small text-muted">{{ lesson.summary }}</div>
+              <a href="{{ url_for('learning.detail', slug=lesson.slug) }}" class="small">Open module</a>
+            </div>
+          </div>
+          {% else %}
+          <div class="col-12"><p class="text-muted mb-0">You have not published any lesson content yet.</p></div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="glass-card p-4 reveal-card mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="h5 mb-0">Top performing posts</h2>
+          <span class="badge text-bg-warning-subtle text-warning-emphasis">Engagement</span>
+        </div>
+        <div class="row g-3 mb-4">
+          {% for artwork in top_artworks %}
+          <div class="col-md-6">
+            <div class="mini-art social-mini">
+              <div class="small text-muted mb-1">{{ artwork.like_count + artwork.share_count + artwork.download_count + artwork.favourite_count }} total engagements</div>
+              <div class="fw-semibold">{{ artwork.title }}</div>
+              <div class="small text-muted">{{ artwork.like_count }} likes | {{ artwork.share_count }} shares | {{ artwork.download_count }} downloads</div>
+            </div>
+          </div>
+          {% else %}
+          <div class="col-12"><p class="text-muted mb-0">Upload artwork to see which posts are performing best.</p></div>
+          {% endfor %}
+        </div>
+        <h2 class="h5 mb-3">Favourite artwork</h2>
+        <div class="row g-3">
+          {% for artwork in favourites %}
+          <div class="col-md-6">
+            <div class="mini-art social-mini">
+              <div class="fw-semibold">{{ artwork.title }}</div>
+              <div class="small text-muted">{{ artwork.category.name }}</div>
+            </div>
+          </div>
+          {% else %}
+          <div class="col-12"><p class="text-muted">No favourites saved yet.</p></div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

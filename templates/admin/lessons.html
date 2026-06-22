@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="container py-5">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-end gap-3 mb-4">
+    <div>
+      <span class="badge text-bg-primary-subtle text-primary-emphasis mb-2">Course management</span>
+      <h1 class="section-title mb-1">Manage lessons</h1>
+      <p class="text-muted mb-0">Keep the civic learning modules current, structured, and easy to navigate.</p>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('learning.create') }}">Create lesson</a>
+  </div>
+
+  <div class="glass-card p-4">
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Lesson</th>
+            <th>Author</th>
+            <th>Progress</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for lesson in lessons %}
+          <tr>
+            <td class="fw-semibold">{{ lesson.order }}</td>
+            <td>
+              <div class="fw-semibold">{{ lesson.title }}</div>
+              <div class="small text-muted">{{ lesson.summary }}</div>
+            </td>
+            <td>{{ lesson.author.username if lesson.author else "Admin team" }}</td>
+            <td>
+              <div class="small text-muted">{{ lesson.completion_count }} learners tracked</div>
+              <div class="small text-muted">{{ lesson.completion_rate }}% completion rate</div>
+            </td>
+            <td>
+              <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('learning.detail', slug=lesson.slug) }}">View</a>
+                <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('learning.edit', slug=lesson.slug) }}">Edit</a>
+                <form method="post" action="{{ url_for('admin.delete_lesson', lesson_id=lesson.id) }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5">
+              <div class="empty-spot my-3">
+                <div class="fw-semibold">No lessons yet.</div>
+                <div class="small text-muted">Use the create button to add the first course module.</div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}

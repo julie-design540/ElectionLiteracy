@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="glass-card p-4 p-md-5">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+          <div>
+            <span class="badge text-bg-primary-subtle text-primary-emphasis mb-2">Artwork submission</span>
+            <h1 class="section-title mb-0">{{ page_title }}</h1>
+          </div>
+          <div class="small text-muted">Uploads are reviewed before they appear publicly as civic learning material.</div>
+        </div>
+        <form method="post" enctype="multipart/form-data">
+          {{ form.hidden_tag() }}
+          <div class="mb-3">{{ form.title.label(class="form-label") }}{{ form.title(class="form-control") }}</div>
+          <div class="mb-3">{{ form.description.label(class="form-label") }}{{ form.description(class="form-control", rows="6") }}</div>
+          <div class="mb-3">{{ form.category_id.label(class="form-label") }}{{ form.category_id(class="form-select") }}</div>
+          <div class="mb-3">
+            {{ form.image.label(class="form-label") }}
+            <label class="dropzone" for="artwork-image-input" id="artworkDropzone">
+              <div class="dropzone-preview" id="artworkPreview">
+                <i class="bi bi-cloud-arrow-up display-5 mb-2"></i>
+                <div class="fw-semibold">Drag and drop your artwork here</div>
+                <div class="small text-muted">or click to browse a file</div>
+              </div>
+              <img id="artworkPreviewImage" class="dropzone-image d-none" alt="Artwork preview">
+              <div class="dropzone-filename small text-muted mt-3" id="artworkFileName">PNG, JPG, WEBP up to 8MB</div>
+            </label>
+            {{ form.image(class="form-control visually-hidden", accept="image/*", id="artwork-image-input") }}
+          </div>
+          <div class="mb-3">
+            {{ form.video_url.label(class="form-label") }}
+            {{ form.video_url(class="form-control", placeholder="YouTube or Vimeo link for a civic video") }}
+            <div class="form-text">Use this for voter education clips, explainers, interviews, or campaign-literacy videos.</div>
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-primary" type="submit">{{ form.submit.label.text }}</button>
+            <a class="btn btn-outline-secondary" href="{{ url_for('main.gallery') }}">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="glass-card p-4 h-100 reveal-card">
+        <span class="badge text-bg-warning-subtle text-warning-emphasis mb-3">Before you upload</span>
+        <h2 class="h5">Make the civic message clear</h2>
+        <div class="flag-bar mb-4"></div>
+        <ul class="list-unstyled small text-muted mb-4 upload-tips">
+          <li>Use a strong title that reflects the election or civic theme.</li>
+          <li>Choose a category that matches the message of the artwork.</li>
+          <li>Upload a clean image or add a verified video link with a clear civic message.</li>
+          <li>After submission you will land on a confirmation page with a direct link to the item.</li>
+        </ul>
+        <h3 class="h6 mb-3">Voting responsibly</h3>
+        <p class="small text-muted mb-2">Art that educates should also encourage voters to:</p>
+        <ul class="list-unstyled small text-muted upload-tips">
+          <li>Verify candidate information before casting your vote.</li>
+          <li>Respect polling station rules and bring your ID.</li>
+          <li>Share civic messages that build trust and participation.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

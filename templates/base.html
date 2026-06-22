@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title or "Civic Education Platform" }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-app">
+  <div id="page-loader" class="page-loader">
+    <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+  </div>
+
+  <div class="top-ribbon">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2 py-2">
+      <div class="top-ribbon__lead small fw-semibold">Kenya's civic education platform for structured learning, verified uploads, and public engagement.</div>
+      <div class="top-ribbon__meta small">Learn, contribute, review, improve</div>
+    </div>
+  </div>
+
+  <nav class="navbar navbar-expand-lg navbar-dark nav-glass sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="{{ url_for('main.home') }}">CivicArt KE</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.gallery') }}">Feed</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('learning.index') }}">Learning</a></li>
+          {% if current_user.is_authenticated %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('artwork.create') }}">Upload</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('learning.create') }}">New Lesson</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.profile') }}">Profile</a></li>
+          {% if current_user.is_admin %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.dashboard') }}">Admin</a></li>
+          {% endif %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a></li>
+          {% else %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Login</a></li>
+          <li class="nav-item"><a class="btn btn-warning btn-sm fw-semibold ms-lg-2" href="{{ url_for('auth.register') }}">Join Now</a></li>
+          {% endif %}
+          <li class="nav-item ms-lg-2">
+            <button class="btn btn-outline-light btn-sm" id="themeToggle" type="button">
+              <i class="bi bi-moon-stars"></i>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer mt-5">
+    <div class="container py-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+      <div>
+        <div class="fw-semibold">CivicArt KE</div>
+        <small class="text-muted">A civic education platform built to inform, train, and empower Kenyan communities.</small>
+      </div>
+      <div class="text-md-end">
+        <small class="text-muted">Built for civic learning, course progress, and responsible participation.</small>
+      </div>
+    </div>
+  </footer>
+
+  <nav class="mobile-app-nav d-lg-none" aria-label="Mobile app navigation">
+    <a class="mobile-app-nav__item {{ 'active' if request.endpoint == 'main.home' else '' }}" href="{{ url_for('main.home') }}">
+      <i class="bi bi-house-door"></i>
+      <span>Home</span>
+    </a>
+    <a class="mobile-app-nav__item {{ 'active' if request.endpoint == 'main.gallery' else '' }}" href="{{ url_for('main.gallery') }}">
+      <i class="bi bi-grid"></i>
+      <span>Feed</span>
+    </a>
+    <a class="mobile-app-nav__item {{ 'active' if request.endpoint and request.endpoint.startswith('learning.') else '' }}" href="{{ url_for('learning.index') }}">
+      <i class="bi bi-journal-check"></i>
+      <span>Learn</span>
+    </a>
+    {% if current_user.is_authenticated %}
+    <a class="mobile-app-nav__item {{ 'active' if request.endpoint == 'artwork.create' else '' }}" href="{{ url_for('artwork.create') }}">
+      <i class="bi bi-plus-circle"></i>
+      <span>Upload</span>
+    </a>
+    <a class="mobile-app-nav__item {{ 'active' if request.endpoint and request.endpoint.startswith('auth.profile') else '' }}" href="{{ url_for('auth.profile') }}">
+      <i class="bi bi-person"></i>
+      <span>Profile</span>
+    </a>
+    {% else %}
+    <a class="mobile-app-nav__item {{ 'active' if request.endpoint == 'auth.login' else '' }}" href="{{ url_for('auth.login') }}">
+      <i class="bi bi-box-arrow-in-right"></i>
+      <span>Login</span>
+    </a>
+    {% endif %}
+  </nav>
+
+  <div class="toast-container position-fixed top-0 end-0 p-3">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+      <div class="toast align-items-center text-bg-{{ 'warning' if category == 'warning' else category }} border-0 show mb-2" role="alert">
+        <div class="d-flex">
+          <div class="toast-body">{{ message }}</div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+      </div>
+      {% endfor %}
+    {% endwith %}
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

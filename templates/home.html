@@ -1,0 +1,414 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero-section hero-carousel-shell">
+  <div id="homeHeroCarousel" class="carousel slide carousel-fade hero-pill-carousel" data-bs-ride="carousel" data-bs-interval="6500">
+    <div class="carousel-indicators hero-carousel-indicators">
+      <button type="button" data-bs-target="#homeHeroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Learning slide">
+        <i class="bi bi-journal-check"></i>
+        <span>Learn</span>
+      </button>
+      <button type="button" data-bs-target="#homeHeroCarousel" data-bs-slide-to="1" aria-label="Contribution slide">
+        <i class="bi bi-cloud-arrow-up"></i>
+        <span>Contribute</span>
+      </button>
+      <button type="button" data-bs-target="#homeHeroCarousel" data-bs-slide-to="2" aria-label="Accountability slide">
+        <i class="bi bi-bar-chart-line"></i>
+        <span>Impact</span>
+      </button>
+    </div>
+
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <div class="hero-slide hero-slide--learning">
+          <div class="container py-5">
+            <div class="row align-items-center g-5">
+              <div class="col-lg-6">
+                <span class="badge text-bg-light text-dark mb-3">Kenyan civic education</span>
+                <h1 class="display-4 fw-bold hero-title">Learn civic responsibility through structured course modules.</h1>
+                <p class="lead text-white-75">Study voting, public accountability, constitutional rights, devolution, and responsible participation through guided lessons with progress tracking.</p>
+                <div class="d-flex flex-wrap gap-3 mt-4">
+                  <a class="btn btn-warning btn-lg fw-semibold" href="{{ url_for('learning.index') }}">Start learning</a>
+                  {% if continue_lesson %}
+                  <a class="btn btn-outline-light btn-lg" href="{{ url_for('learning.detail', slug=continue_lesson.slug) }}">Continue lesson</a>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="hero-card glass-card p-4 reveal-card">
+                  <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                      <div class="text-muted small">Continue your course</div>
+                      <h3 class="h5 mb-0">Civic learning progress</h3>
+                    </div>
+                    <i class="bi bi-journal-check fs-2 text-warning"></i>
+                  </div>
+                  <div class="p-3 rounded-4 bg-body-tertiary mb-3">
+                    <div class="d-flex justify-content-between small mb-2">
+                      <span>Modules completed</span>
+                      <span>{{ completed_lessons }} / {{ lessons|length }}</span>
+                    </div>
+                    <div class="progress" style="height: 12px;">
+                      <div class="progress-bar" style="width: {{ learning_progress }}%"></div>
+                    </div>
+                  </div>
+                  <div class="row g-3">
+                    <div class="col-6">
+                      <div class="mini-tile">
+                        <div>
+                          <div class="display-6 fw-bold mb-0">{{ learning_progress|int }}%</div>
+                          <div class="small text-muted">Course progress</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="mini-tile">
+                        <div>
+                          <div class="display-6 fw-bold mb-0">{{ lessons|length }}</div>
+                          <div class="small text-muted">Active lessons</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {% if continue_lesson %}
+                  <div class="mt-3 p-3 rounded-4 bg-body-tertiary">
+                    <div class="small text-muted text-uppercase mb-1">Next lesson</div>
+                    <div class="fw-semibold">{{ continue_lesson.title }}</div>
+                    <div class="small text-muted">{{ continue_lesson.summary }}</div>
+                    <a class="btn btn-primary btn-sm mt-3" href="{{ url_for('learning.detail', slug=continue_lesson.slug) }}">Open lesson</a>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="hero-slide hero-slide--create">
+          <div class="container py-5">
+            <div class="row align-items-center g-5">
+              <div class="col-lg-7">
+                <span class="badge text-bg-light text-dark mb-3">Create and contribute</span>
+                <h1 class="display-4 fw-bold hero-title">Turn civic knowledge into artwork, lessons, and public dialogue.</h1>
+                <p class="lead text-white-75">Members can upload civic artwork, publish lesson resources, comment, save, share, and help keep public education active beyond election season.</p>
+                <div class="d-flex flex-wrap gap-3 mt-4">
+                  {% if current_user.is_authenticated %}
+                  <a class="btn btn-warning btn-lg fw-semibold" href="{{ url_for('artwork.create') }}">Upload artwork</a>
+                  <a class="btn btn-outline-light btn-lg" href="{{ url_for('learning.create') }}">Create lesson</a>
+                  {% else %}
+                  <a class="btn btn-warning btn-lg fw-semibold" href="{{ url_for('auth.register') }}">Create account</a>
+                  <a class="btn btn-outline-light btn-lg" href="{{ url_for('main.gallery') }}">Browse feed</a>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-lg-5">
+                <div class="hero-feature-panel">
+                  <div class="hero-feature-row">
+                    <i class="bi bi-cloud-arrow-up"></i>
+                    <div>
+                      <div class="fw-semibold">Upload civic content</div>
+                      <div class="small text-white-75">Submit artwork and lesson material for public learning.</div>
+                    </div>
+                  </div>
+                  <div class="hero-feature-row">
+                    <i class="bi bi-chat-square-text"></i>
+                    <div>
+                      <div class="fw-semibold">Discuss responsibly</div>
+                      <div class="small text-white-75">Comment, save, share, and report content with context.</div>
+                    </div>
+                  </div>
+                  <div class="hero-feature-row">
+                    <i class="bi bi-shield-check"></i>
+                    <div>
+                      <div class="fw-semibold">Reviewed by admins</div>
+                      <div class="small text-white-75">Moderation keeps civic information useful and respectful.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="hero-slide hero-slide--impact">
+          <div class="container py-5">
+            <div class="row align-items-center g-5">
+              <div class="col-lg-6">
+                <span class="badge text-bg-light text-dark mb-3">Public accountability</span>
+                <h1 class="display-4 fw-bold hero-title">Keep civic participation alive before and after elections.</h1>
+                <p class="lead text-white-75">Use the platform to follow rights, budgets, leadership promises, county services, and digital information integrity in one civic learning space.</p>
+                <div class="d-flex flex-wrap gap-3 mt-4">
+                  <a class="btn btn-warning btn-lg fw-semibold" href="{{ url_for('main.gallery') }}">Explore civic feed</a>
+                  <a class="btn btn-outline-light btn-lg" href="{{ url_for('learning.index') }}">View course</a>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="hero-stats hero-stats--carousel">
+                  <div class="hero-stat">
+                    <div class="h3 fw-bold mb-0">{{ featured_count }}</div>
+                    <div class="small text-white-75">Approved posts</div>
+                  </div>
+                  <div class="hero-stat">
+                    <div class="h3 fw-bold mb-0">{{ user_count }}</div>
+                    <div class="small text-white-75">Registered users</div>
+                  </div>
+                  <div class="hero-stat">
+                    <div class="h3 fw-bold mb-0">{{ lesson_count }}</div>
+                    <div class="small text-white-75">Course modules</div>
+                  </div>
+                </div>
+                <div class="hero-impact-note mt-3">
+                  <i class="bi bi-bar-chart-line"></i>
+                  <div>
+                    <div class="fw-semibold">Built for measurable civic growth</div>
+                    <div class="small text-white-75">Track learning progress, content activity, reports, and community contributions.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="carousel-control-prev hero-carousel-control" type="button" data-bs-target="#homeHeroCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next hero-carousel-control" type="button" data-bs-target="#homeHeroCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+</section>
+
+<section class="content-band">
+  <div class="container">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4">
+      <div>
+        <span class="badge text-bg-primary-subtle text-primary-emphasis mb-2">Civic knowledge base</span>
+        <h2 class="section-title mb-1">What users can learn and practice</h2>
+        <p class="text-muted mb-0">The platform now gives users clear civic topics, practical actions, and contribution paths.</p>
+      </div>
+      <a class="btn btn-outline-primary" href="{{ url_for('learning.index') }}">Open full course</a>
+    </div>
+    <div class="insight-grid">
+      <article class="insight-card">
+        <div class="insight-card__icon"><i class="bi bi-bank"></i></div>
+        <div>
+          <h3 class="h6 mt-3">Constitution and rights</h3>
+          <p class="small text-muted mb-0">Understand citizen rights, public duties, devolution, and how the Constitution structures government.</p>
+        </div>
+      </article>
+      <article class="insight-card">
+        <div class="insight-card__icon"><i class="bi bi-check2-square"></i></div>
+        <div>
+          <h3 class="h6 mt-3">Voting readiness</h3>
+          <p class="small text-muted mb-0">Prepare for elections with guidance on polling stations, IDs, ballot handling, and responsible choices.</p>
+        </div>
+      </article>
+      <article class="insight-card">
+        <div class="insight-card__icon"><i class="bi bi-people"></i></div>
+        <div>
+          <h3 class="h6 mt-3">Public participation</h3>
+          <p class="small text-muted mb-0">Learn how to attend forums, submit views, follow budgets, and keep county services accountable.</p>
+        </div>
+      </article>
+      <article class="insight-card">
+        <div class="insight-card__icon"><i class="bi bi-shield-check"></i></div>
+        <div>
+          <h3 class="h6 mt-3">Information integrity</h3>
+          <p class="small text-muted mb-0">Build habits for checking sources, avoiding misinformation, and reporting harmful civic content.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="container py-5">
+  <div class="d-flex justify-content-between align-items-end gap-3 mb-4">
+    <div>
+      <span class="badge text-bg-warning-subtle text-warning-emphasis mb-2">Featured spotlight</span>
+      <h2 class="section-title mb-1">Curated civic stories</h2>
+    </div>
+    <a class="small text-decoration-none" href="{{ url_for('main.gallery') }}">View all</a>
+  </div>
+  <div class="row g-4">
+    {% for artwork in featured %}
+    <div class="col-md-4">
+      <div class="art-card glass-card h-100 reveal-card">
+        {% if artwork.has_video %}
+        <div class="ratio ratio-16x9 social-video">
+          <iframe src="{{ artwork.video_embed_url }}" title="{{ artwork.title }}" allowfullscreen loading="lazy"></iframe>
+        </div>
+        {% endif %}
+        {% if artwork.filename %}
+        <img src="{{ url_for('static', filename='uploads/artworks/' ~ artwork.filename) }}" class="art-image" alt="{{ artwork.title }}">
+        {% endif %}
+        <div class="p-3">
+          <div class="small text-muted mb-1">{{ artwork.category.name }}</div>
+          <div class="fw-semibold">{{ artwork.title }}</div>
+          <p class="small text-muted mb-0">{{ artwork.description[:90] }}{% if artwork.description|length > 90 %}...{% endif %}</p>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+      <div class="alert alert-info mb-0">No featured artwork yet. Approve a few standout pieces to show them here.</div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="container py-5">
+  <div class="lesson-card reveal-card">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-4">
+      <div>
+        <span class="badge text-bg-primary-subtle text-primary-emphasis mb-2">Learning track</span>
+        <h2 class="section-title mb-2">A practical course built around Kenyan civic life</h2>
+        <p class="text-muted mb-3">The course moves from fundamentals to participation and accountability, so users can learn in sequence and return later to continue where they stopped.</p>
+      </div>
+      <div class="text-md-end small text-muted">
+        <div class="fw-semibold">Key themes</div>
+        <div>Voting, accountability, leadership, and community action</div>
+      </div>
+    </div>
+    <div class="flag-bar"></div>
+    <div class="row g-3">
+      {% for lesson in lessons[:3] %}
+      <div class="col-md-4">
+        <article class="course-card h-100">
+          <div class="course-card__head">
+            <div class="course-meta">
+              <span>Module {{ lesson.order }}</span>
+              <span>{{ lesson.estimated_minutes }} min</span>
+            </div>
+          </div>
+          <div class="course-card__body">
+            <h3 class="h6">{{ lesson.title }}</h3>
+            <p class="small text-muted mb-3">{{ lesson.summary }}</p>
+            <a class="small fw-semibold text-decoration-none" href="{{ url_for('learning.detail', slug=lesson.slug) }}">Study module</a>
+          </div>
+        </article>
+      </div>
+      {% else %}
+      <div class="col-12">
+        <p class="text-muted mb-0">No learning modules available yet.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="content-band">
+  <div class="container">
+    <div class="row g-4 align-items-stretch">
+      <div class="col-lg-4">
+        <div class="glass-card p-4 h-100">
+          <span class="badge text-bg-primary-subtle text-primary-emphasis mb-3">Participation checklist</span>
+          <h2 class="h5">Before election day</h2>
+          <ul class="list-unstyled small text-muted upload-tips mb-0">
+            <li>Confirm your registration details and polling station early.</li>
+            <li>Compare manifestos and candidate records against local needs.</li>
+            <li>Discuss issues respectfully and avoid sharing unverified claims.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="glass-card p-4 h-100">
+          <span class="badge text-bg-warning-subtle text-warning-emphasis mb-3">During voting</span>
+          <h2 class="h5">At the polling station</h2>
+          <ul class="list-unstyled small text-muted upload-tips mb-0">
+            <li>Carry the correct ID and follow queue and verification instructions.</li>
+            <li>Mark your ballot privately and ask officials for procedural guidance.</li>
+            <li>Keep the process peaceful and report irregularities through official channels.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="glass-card p-4 h-100">
+          <span class="badge text-bg-success-subtle text-success-emphasis mb-3">After elections</span>
+          <h2 class="h5">Stay accountable</h2>
+          <ul class="list-unstyled small text-muted upload-tips mb-0">
+            <li>Track public promises, budgets, and service delivery timelines.</li>
+            <li>Attend participation forums and submit evidence-based feedback.</li>
+            <li>Use civic art and lessons to keep public education active year round.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container py-5">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4">
+    <div>
+      <span class="badge text-bg-primary-subtle text-primary-emphasis mb-2">Featured civic work</span>
+      <h2 class="section-title mb-1">Latest approved artwork</h2>
+      <p class="text-muted mb-0">Fresh uploads approved by the admin team.</p>
+    </div>
+    <a href="{{ url_for('main.gallery') }}" class="btn btn-outline-primary">See feed</a>
+  </div>
+  <div class="row g-4">
+    {% for artwork in latest %}
+    <div class="col-md-6 col-lg-3">
+      <div class="art-card glass-card h-100 reveal-card">
+        {% if artwork.has_video %}
+        <div class="ratio ratio-16x9 social-video">
+          <iframe src="{{ artwork.video_embed_url }}" title="{{ artwork.title }}" allowfullscreen loading="lazy"></iframe>
+        </div>
+        {% endif %}
+        {% if artwork.filename %}
+        <img src="{{ url_for('static', filename='uploads/artworks/' ~ artwork.filename) }}" class="art-image" alt="{{ artwork.title }}">
+        {% endif %}
+        <div class="p-3">
+          <div class="d-flex justify-content-between align-items-center small text-muted mb-1">
+            <span>{{ artwork.category.name }}</span>
+            <span><i class="bi bi-heart"></i> {{ artwork.like_count }}</span>
+          </div>
+          <h3 class="h6">{{ artwork.title }}</h3>
+          <p class="small text-muted mb-2">{{ artwork.description[:88] }}{% if artwork.description|length > 88 %}...{% endif %}</p>
+          <a class="btn btn-sm btn-primary mt-1" href="{{ url_for('artwork.detail', slug=artwork.slug) }}">View</a>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+      <div class="alert alert-info">No approved artwork yet. Seed the database and upload artwork to get started.</div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="container py-5">
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <div class="info-panel country-card country-card--gold glass-card p-4 h-100 reveal-card">
+        <div class="country-card__icon"><i class="bi bi-flag"></i></div>
+        <span class="country-card__eyebrow">Kenya first</span>
+        <h3 class="h4">Understand the nation you belong to.</h3>
+        <p class="text-muted mb-0">Explore rights, duties, national values, and the institutions that shape everyday life across the country.</p>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="info-panel country-card country-card--green glass-card p-4 h-100 reveal-card">
+        <div class="country-card__icon"><i class="bi bi-bank"></i></div>
+        <span class="country-card__eyebrow">Public service</span>
+        <h3 class="h4">Follow how decisions affect communities.</h3>
+        <p class="text-muted mb-0">Learn how counties, Parliament, courts, and public offices connect to services, budgets, and accountability.</p>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="info-panel country-card country-card--red glass-card p-4 h-100 reveal-card">
+        <div class="country-card__icon"><i class="bi bi-people"></i></div>
+        <span class="country-card__eyebrow">Citizen voice</span>
+        <h3 class="h4">Take part with clarity and respect.</h3>
+        <p class="text-muted mb-0">Use civic knowledge to vote wisely, join public participation, question leaders, and protect national unity.</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
