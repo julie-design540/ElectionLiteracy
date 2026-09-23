@@ -51,11 +51,8 @@ On Windows, you can also run `run.bat` from the project root.
 
 ## Default Admin
 
-- Email: `admin@civicart.local`
-- Username: `admin`
-- Password: `Admin@12345`
-
-Change these values before deploying.
+The administrator account is created using environment variables.
+Set SEED_ADMIN_EMAIL, SEED_ADMIN_USERNAME, and SEED_ADMIN_PASSWORD before running the seed command.
 
 ## Module Checklist
 
@@ -68,10 +65,6 @@ Change these values before deploying.
 - `templates/` home, gallery, auth, artwork, admin, and error pages
 - `static/` theme styling and client-side interactions
 - `docs/` user, admin, testing, deployment, and analysis documentation
-
-## Notes
-
-The project is intentionally simple and uses server-rendered pages instead of a REST API. It is designed to be understandable, extensible, and suitable for a final-year computer science defense.
 
 The core workflow is:
 
